@@ -1,0 +1,177 @@
+{
+  "format": "bf6-scene-library-compatibility-patch",
+  "version": 1,
+  "newlineNormalization": "LF",
+  "targets": [
+    "addons/scene-library/scripts/scene_library.gd",
+    "addons/bf6_sfx_fx/scene_library_patch/scene_library.gd.patched"
+  ],
+  "transforms": [
+    {
+      "name": "folders",
+      "input_sha256": "868c211976fd012f1dcf74c035edd46c6dd82cc39fd0df65b5679b6f5e6011f3",
+      "output_sha256": "9ad6b7e9a6b8c9116fce178cb241fa4e1a21147b2e1dbbb98224d27a955463f1",
+      "replacements": [
+        {
+          "before": "var _saved: bool = true",
+          "after": "# Library index and thumbnails are demand-loaded, never part of editor startup.\nconst LAZY_LIBRARY_VERSION := 1\nconst THUMBNAIL_CACHE_LIMIT := 256\nvar _library_pending := false\nvar _lazy_timer: Timer\nvar _placeholder: ImageTexture\nvar _thumbnail_lru: Array[int] = []\nvar _visible_indices: Array[int] = []\nvar _thumbnail_cursor := 0\nvar _last_view := Rect2()\nvar _view_dirty := true\nvar _thumbnail_creations := 0\nvar _thumbnail_ready: Dictionary[int, bool] = {}\n\nvar _saved: bool = true"
+        },
+        {
+          "before": "\tload_library(_curr_lib_path)\n",
+          "after": "\t_library_pending = true\n\t_lazy_timer = Timer.new()\n\t_lazy_timer.wait_time = 0.1\n\t_lazy_timer.timeout.connect(_lazy_tick)\n\tadd_child(_lazy_timer)\n\t_lazy_timer.start()\n\tvisibility_changed.connect(func(): _view_dirty = true)\n\t_item_list.get_v_scroll_bar().value_changed.connect(func(_value): _view_dirty = true)\n\t_item_list.resized.connect(func(): _view_dirty = true)\n"
+        },
+        {
+          "before": "func _exit_tree() -> void:\n\t_mutex.lock()",
+          "after": "func _exit_tree() -> void:\n\tif _mutex == null:\n\t\treturn\n\t_mutex.lock()"
+        },
+        {
+          "before": "\t\t_thread.wait_to_finish()\n",
+          "after": "\t\t_thread.wait_to_finish()\n\t_viewport.queue_free()\n"
+        },
+        {
+          "before": "func _create_asset(id: int, path: String) -> Dictionary[StringName, Variant]:\n\treturn {\n\t\t&\"id\": id,\n\t\t&\"path\": path,\n\t\t&\"thumb\": _get_or_create_thumbnail(id, path),\n\t}",
+          "after": "func _create_asset(id: int, path: String) -> Dictionary[StringName, Variant]:\n\treturn create_asset_no_thumbnail(id, path)"
+        },
+        {
+          "before": "\tif not is_valid_scene_file(path):\n\t\treturn {}\n\n\treturn _create_asset(id, path)",
+          "after": "\t# Keep missing assets in the authored index. Validate only when rendered or\n\t# opened; an unavailable file must not disappear on the next library save.\n\treturn _create_asset(id, path)"
+        },
+        {
+          "before": "func load_library(path: String) -> void:\n\tvar library",
+          "after": "func load_library(path: String) -> void:\n\t_library_pending = false\n\tvar library"
+        },
+        {
+          "before": "\t\t_item_list.set_item_icon(index, asset.thumb)\n\t\t# NOTE:",
+          "after": "\t\t# Display metadata owns transient thumbnails; the library index never does.\n\t\tasset = asset.duplicate()\n\t\tif asset.thumb == null:\n\t\t\tasset[&\"__lazy_thumbnail\"] = true\n\t\t\tasset.thumb = _placeholder_thumbnail()\n\t\t_item_list.set_item_icon(index, asset.thumb)\n\t\t# NOTE:"
+        },
+        {
+          "before": "\t_item_list.set_item_count(index)\n",
+          "after": "\t_item_list.set_item_count(index)\n\t_view_dirty = true\n"
+        },
+        {
+          "before": "\tvar thumb: ImageTexture = _thumbnails.get(id, null)\n\tif is_instance_valid(thumb):\n\t\treturn thumb",
+          "after": "\tvar thumb: ImageTexture = _thumbnails.get(id, null)\n\t_thumbnail_lru.erase(id)\n\t_thumbnail_lru.append(id)\n\tif is_instance_valid(thumb):\n\t\tif not _thumbnail_ready.get(id, false):\n\t\t\t_queue_update_thumbnail(path)\n\t\treturn thumb\n\t_thumbnail_creations += 1"
+        },
+        {
+          "before": "\t\t_thumbnails[id] = thumb\n\telse:",
+          "after": "\t\t_thumbnails[id] = thumb\n\t\t_thumbnail_ready[id] = true\n\telse:"
+        },
+        {
+          "before": "\tthumb.update(image)\n",
+          "after": "\tthumb.update(image)\n\t_thumbnail_ready[get_path_hash(item.path)] = true\n"
+        },
+        {
+          "before": "func handle_file_moved(old_file: String, new_file: String) -> void:\n\tif not _thumbnails.has(get_path_hash(new_file)):\n\t\treturn",
+          "after": "func handle_file_moved(old_file: String, new_file: String) -> void:\n\tif _library_pending:\n\t\tload_library(_curr_lib_path)"
+        },
+        {
+          "before": "func handle_file_removed(file: String) -> void:\n",
+          "after": "func handle_file_removed(file: String) -> void:\n\tif _library_pending:\n\t\tload_library(_curr_lib_path)\n"
+        },
+        {
+          "before": "\t\tconst THUMB_PLACEHOLDER_PATH: String = \"res://addons/scene-library/icons/thumb_placeholder.svg\"\n\n\t\tvar thumb_placeholder_path: String = ProjectSettings.globalize_path(THUMB_PLACEHOLDER_PATH)\n\t\tthumb = ImageTexture.create_from_image(Image.load_from_file(thumb_placeholder_path))",
+          "after": "\t\t# Each queued renderer updates its own texture; the shared placeholder\n\t\t# must never be modified by a completed thumbnail.\n\t\tthumb = ImageTexture.create_from_image(_placeholder_thumbnail().get_image())"
+        },
+        {
+          "before": "func _render_thumb(item: Dictionary[StringName, Variant], callback: Callable) -> void:\n\tif not is_valid_scene_file(item.path):",
+          "after": "func _render_thumb(item: Dictionary[StringName, Variant], callback: Callable) -> void:\n\tif not is_visible_in_tree() or not is_valid_scene_file(item.path):"
+        },
+        {
+          "before": "\twhile fs.is_scanning():\n\t\tpass  # need to wait for editor startup to complete before trying to load resources",
+          "after": "\twhile fs.is_scanning():\n\t\t_mutex.lock()\n\t\tvar stopping := _exit_thread\n\t\t_mutex.unlock()\n\t\tif stopping:\n\t\t\treturn\n\t\tOS.delay_msec(10)"
+        },
+        {
+          "before": "func _update_thumb_icon_size(display_mode: DisplayMode) -> void:\n",
+          "after": "func _update_thumb_icon_size(display_mode: DisplayMode) -> void:\n\t_view_dirty = true\n"
+        },
+        {
+          "before": "func _queue_has_path(path: String) -> bool:",
+          "after": "func _placeholder_thumbnail() -> ImageTexture:\n\tif _placeholder == null:\n\t\tvar path := ProjectSettings.globalize_path(\"res://addons/scene-library/icons/thumb_placeholder.svg\")\n\t\t_placeholder = ImageTexture.create_from_image(Image.load_from_file(path))\n\treturn _placeholder\n\n\nfunc _lazy_tick() -> void:\n\tif not is_visible_in_tree():\n\t\treturn\n\tvar base := EditorInterface.get_base_control()\n\tif bool(base.get_meta(\"bf6_home_startup_pending\", false)):\n\t\treturn\n\tif EditorInterface.get_resource_filesystem().is_scanning():\n\t\treturn\n\tif _library_pending:\n\t\tload_library(_curr_lib_path)\n\t\treturn # Let ItemList finish layout before asking for item rectangles.\n\t_refresh_visible_thumbnails()\n\n\nfunc _refresh_visible_thumbnails() -> void:\n\tvar view := Rect2(Vector2(0, _item_list.get_v_scroll_bar().value), _item_list.size)\n\tif _view_dirty or view != _last_view:\n\t\t_view_dirty = false\n\t\t_last_view = view\n\t\t_visible_indices.clear()\n\t\t_thumbnail_cursor = 0\n\t\t# Drop work belonging to the previous collection or scroll position.\n\t\t_mutex.lock()\n\t\t_thread_queue.clear()\n\t\t_mutex.unlock()\n\t\tfor i in _item_list.item_count:\n\t\t\tvar asset: Dictionary = _item_list.get_item_metadata(i)\n\t\t\tif not asset.get(\"__lazy_thumbnail\", false):\n\t\t\t\tcontinue\n\t\t\tif _item_list.get_item_rect(i).intersects(view):\n\t\t\t\t_visible_indices.append(i)\n\t\t\telse:\n\t\t\t\tasset.thumb = _placeholder_thumbnail()\n\t\t\t\t_item_list.set_item_icon(i, asset.thumb)\n\tvar started := Time.get_ticks_usec()\n\tvar done := 0\n\twhile _thumbnail_cursor < _visible_indices.size() and done < 8:\n\t\tvar i := _visible_indices[_thumbnail_cursor]\n\t\t_thumbnail_cursor += 1\n\t\tvar asset: Dictionary = _item_list.get_item_metadata(i)\n\t\tasset.thumb = _get_or_create_thumbnail(int(asset.id), str(asset.path))\n\t\t_item_list.set_item_icon(i, asset.thumb)\n\t\tdone += 1\n\t\tif Time.get_ticks_usec() - started >= 4000:\n\t\t\tbreak\n\twhile _thumbnail_lru.size() > THUMBNAIL_CACHE_LIMIT:\n\t\t_thumbnails.erase(_thumbnail_lru.pop_front())\n\n\nfunc _queue_has_path(path: String) -> bool:"
+        }
+      ]
+    },
+    {
+      "name": "stock",
+      "input_sha256": "9428edc10e08cf70a674beb9256bab727726091dd7646b0359f8399c2d9330d9",
+      "output_sha256": "e714e159f5fa4ebd374f4c9d209b8caafcb1c996c5fe69dcbbe9e5adde7f30f0",
+      "replacements": [
+        {
+          "before": "var _saved: bool = true",
+          "after": "# Library index and thumbnails are demand-loaded, never part of editor startup.\nconst LAZY_LIBRARY_VERSION := 1\nconst THUMBNAIL_CACHE_LIMIT := 256\nvar _library_pending := false\nvar _lazy_timer: Timer\nvar _placeholder: ImageTexture\nvar _thumbnail_lru: Array[int] = []\nvar _visible_indices: Array[int] = []\nvar _thumbnail_cursor := 0\nvar _last_view := Rect2()\nvar _view_dirty := true\nvar _thumbnail_creations := 0\nvar _thumbnail_ready: Dictionary[int, bool] = {}\n\nvar _saved: bool = true"
+        },
+        {
+          "before": "\tload_library(_curr_lib_path)\n",
+          "after": "\t_library_pending = true\n\t_lazy_timer = Timer.new()\n\t_lazy_timer.wait_time = 0.1\n\t_lazy_timer.timeout.connect(_lazy_tick)\n\tadd_child(_lazy_timer)\n\t_lazy_timer.start()\n\tvisibility_changed.connect(func(): _view_dirty = true)\n\t_item_list.get_v_scroll_bar().value_changed.connect(func(_value): _view_dirty = true)\n\t_item_list.resized.connect(func(): _view_dirty = true)\n"
+        },
+        {
+          "before": "func _exit_tree() -> void:\n\t_mutex.lock()",
+          "after": "func _exit_tree() -> void:\n\tif _mutex == null:\n\t\treturn\n\t_mutex.lock()"
+        },
+        {
+          "before": "\t\t_thread.wait_to_finish()\n",
+          "after": "\t\t_thread.wait_to_finish()\n\t_viewport.queue_free()\n"
+        },
+        {
+          "before": "func _create_asset(id: int, path: String) -> Dictionary[StringName, Variant]:\n\treturn {\n\t\t&\"id\": id,\n\t\t&\"path\": path,\n\t\t&\"thumb\": _get_or_create_thumbnail(id, path),\n\t}",
+          "after": "func _create_asset(id: int, path: String) -> Dictionary[StringName, Variant]:\n\treturn create_asset_no_thumbnail(id, path)"
+        },
+        {
+          "before": "\tif not is_valid_scene_file(path):\n\t\treturn {}\n\n\treturn _create_asset(id, path)",
+          "after": "\t# Keep missing assets in the authored index. Validate only when rendered or\n\t# opened; an unavailable file must not disappear on the next library save.\n\treturn _create_asset(id, path)"
+        },
+        {
+          "before": "func load_library(path: String) -> void:\n\tvar library",
+          "after": "func load_library(path: String) -> void:\n\t_library_pending = false\n\tvar library"
+        },
+        {
+          "before": "\t\t_item_list.set_item_icon(index, asset.thumb)\n\t\t# NOTE:",
+          "after": "\t\t# Display metadata owns transient thumbnails; the library index never does.\n\t\tasset = asset.duplicate()\n\t\tif asset.thumb == null:\n\t\t\tasset[&\"__lazy_thumbnail\"] = true\n\t\t\tasset.thumb = _placeholder_thumbnail()\n\t\t_item_list.set_item_icon(index, asset.thumb)\n\t\t# NOTE:"
+        },
+        {
+          "before": "\t_item_list.set_item_count(index)\n",
+          "after": "\t_item_list.set_item_count(index)\n\t_view_dirty = true\n"
+        },
+        {
+          "before": "\tvar thumb: ImageTexture = _thumbnails.get(id, null)\n\tif is_instance_valid(thumb):\n\t\treturn thumb",
+          "after": "\tvar thumb: ImageTexture = _thumbnails.get(id, null)\n\t_thumbnail_lru.erase(id)\n\t_thumbnail_lru.append(id)\n\tif is_instance_valid(thumb):\n\t\tif not _thumbnail_ready.get(id, false):\n\t\t\t_queue_update_thumbnail(path)\n\t\treturn thumb\n\t_thumbnail_creations += 1"
+        },
+        {
+          "before": "\t\t_thumbnails[id] = thumb\n\telse:",
+          "after": "\t\t_thumbnails[id] = thumb\n\t\t_thumbnail_ready[id] = true\n\telse:"
+        },
+        {
+          "before": "\tthumb.update(image)\n",
+          "after": "\tthumb.update(image)\n\t_thumbnail_ready[get_path_hash(item.path)] = true\n"
+        },
+        {
+          "before": "func handle_file_moved(old_file: String, new_file: String) -> void:\n\tif not _thumbnails.has(get_path_hash(new_file)):\n\t\treturn",
+          "after": "func handle_file_moved(old_file: String, new_file: String) -> void:\n\tif _library_pending:\n\t\tload_library(_curr_lib_path)"
+        },
+        {
+          "before": "func handle_file_removed(file: String) -> void:\n",
+          "after": "func handle_file_removed(file: String) -> void:\n\tif _library_pending:\n\t\tload_library(_curr_lib_path)\n"
+        },
+        {
+          "before": "\t\tconst THUMB_PLACEHOLDER_PATH: String = \"res://addons/scene-library/icons/thumb_placeholder.svg\"\n\n\t\tvar thumb_placeholder_path: String = ProjectSettings.globalize_path(THUMB_PLACEHOLDER_PATH)\n\t\tthumb = ImageTexture.create_from_image(Image.load_from_file(thumb_placeholder_path))",
+          "after": "\t\t# Each queued renderer updates its own texture; the shared placeholder\n\t\t# must never be modified by a completed thumbnail.\n\t\tthumb = ImageTexture.create_from_image(_placeholder_thumbnail().get_image())"
+        },
+        {
+          "before": "func _render_thumb(item: Dictionary[StringName, Variant], callback: Callable) -> void:\n\tif not is_valid_scene_file(item.path):",
+          "after": "func _render_thumb(item: Dictionary[StringName, Variant], callback: Callable) -> void:\n\tif not is_visible_in_tree() or not is_valid_scene_file(item.path):"
+        },
+        {
+          "before": "\twhile fs.is_scanning():\n\t\tpass  # need to wait for editor startup to complete before trying to load resources",
+          "after": "\twhile fs.is_scanning():\n\t\t_mutex.lock()\n\t\tvar stopping := _exit_thread\n\t\t_mutex.unlock()\n\t\tif stopping:\n\t\t\treturn\n\t\tOS.delay_msec(10)"
+        },
+        {
+          "before": "func _update_thumb_icon_size(display_mode: DisplayMode) -> void:\n",
+          "after": "func _update_thumb_icon_size(display_mode: DisplayMode) -> void:\n\t_view_dirty = true\n"
+        },
+        {
+          "before": "func _queue_has_path(path: String) -> bool:",
+          "after": "func _placeholder_thumbnail() -> ImageTexture:\n\tif _placeholder == null:\n\t\tvar path := ProjectSettings.globalize_path(\"res://addons/scene-library/icons/thumb_placeholder.svg\")\n\t\t_placeholder = ImageTexture.create_from_image(Image.load_from_file(path))\n\treturn _placeholder\n\n\nfunc _lazy_tick() -> void:\n\tif not is_visible_in_tree():\n\t\treturn\n\tvar base := EditorInterface.get_base_control()\n\tif bool(base.get_meta(\"bf6_home_startup_pending\", false)):\n\t\treturn\n\tif EditorInterface.get_resource_filesystem().is_scanning():\n\t\treturn\n\tif _library_pending:\n\t\tload_library(_curr_lib_path)\n\t\treturn # Let ItemList finish layout before asking for item rectangles.\n\t_refresh_visible_thumbnails()\n\n\nfunc _refresh_visible_thumbnails() -> void:\n\tvar view := Rect2(Vector2(0, _item_list.get_v_scroll_bar().value), _item_list.size)\n\tif _view_dirty or view != _last_view:\n\t\t_view_dirty = false\n\t\t_last_view = view\n\t\t_visible_indices.clear()\n\t\t_thumbnail_cursor = 0\n\t\t# Drop work belonging to the previous collection or scroll position.\n\t\t_mutex.lock()\n\t\t_thread_queue.clear()\n\t\t_mutex.unlock()\n\t\tfor i in _item_list.item_count:\n\t\t\tvar asset: Dictionary = _item_list.get_item_metadata(i)\n\t\t\tif not asset.get(\"__lazy_thumbnail\", false):\n\t\t\t\tcontinue\n\t\t\tif _item_list.get_item_rect(i).intersects(view):\n\t\t\t\t_visible_indices.append(i)\n\t\t\telse:\n\t\t\t\tasset.thumb = _placeholder_thumbnail()\n\t\t\t\t_item_list.set_item_icon(i, asset.thumb)\n\tvar started := Time.get_ticks_usec()\n\tvar done := 0\n\twhile _thumbnail_cursor < _visible_indices.size() and done < 8:\n\t\tvar i := _visible_indices[_thumbnail_cursor]\n\t\t_thumbnail_cursor += 1\n\t\tvar asset: Dictionary = _item_list.get_item_metadata(i)\n\t\tasset.thumb = _get_or_create_thumbnail(int(asset.id), str(asset.path))\n\t\t_item_list.set_item_icon(i, asset.thumb)\n\t\tdone += 1\n\t\tif Time.get_ticks_usec() - started >= 4000:\n\t\t\tbreak\n\twhile _thumbnail_lru.size() > THUMBNAIL_CACHE_LIMIT:\n\t\t_thumbnails.erase(_thumbnail_lru.pop_front())\n\n\nfunc _queue_has_path(path: String) -> bool:"
+        }
+      ]
+    }
+  ]
+}

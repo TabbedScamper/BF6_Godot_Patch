@@ -12,6 +12,20 @@ The addon folder remains `bf6_map_selection` for compatibility with earlier inst
 
 Home hides the editor's side docks, bottom panel and optional workspace drawers while you choose a map. Returning to editing restores their previous layout and visibility.
 
+## Start directly at Home
+
+Run `addons/bf6_map_selection/launcher/Launch BF6 Godot.cmd` once from your installed SDK. It opens the Battlefield project directly and creates **BF6 Godot SDK.lnk** beside the bundled editor. Use that shortcut for normal starts. To also create a desktop shortcut, run the same command with `-DesktopShortcut`. Python is not required for this launcher.
+
+Every patched installation opens map selection by default, including existing projects. Previous scenes stay unloaded until you choose a map or explicitly restore them. Their paths and selected tab are preserved; use **Project > Tools > Restore previous BF6 scene tabs** to reopen them. This affects only the current project. To keep native scene restoration instead, set `bf6/home_first` to `false` in the project's settings.
+
+Opening another map keeps unrestored tabs available. Before removing the addon, disable it under Project Settings > Plugins so it can return deferred tabs to Godot's native editor.
+
+The launcher also applies a checked compatibility update to supported Object Library versions while the editor is closed. It keeps original source backups under the SDK's `.bf6-patch/backups` directory and preserves unknown or modified versions. The updated library waits until you use it, then loads previews for visible rows with a bounded cache. Folder features remain optional. Initial scanning/import after a fresh SDK installation or changed assets is still required by Godot.
+
+After moving the SDK folder, rerun the command from its new location to refresh the shortcut. Opening the generic Godot executable itself still opens Godot's project manager.
+
+Repeated shortcut clicks reuse the open editor or the launch already in progress. A running SDK import or other background job is reported instead of being mistaken for an editor window. Each new editor launch writes a local diagnostic log under `.bf6-patch/logs`; no log is uploaded.
+
 ## Maps and creator projects
 
 Home shows the same 25 map identities, names and paid/free grouping as Unreal. Only maps present in the installed SDK can be opened. Choosing a stock map asks for a project name and creates a creator copy. Home does not save over the original SDK map.
@@ -52,5 +66,7 @@ See the launcher's [README](addons/bf6_map_selection/launcher/README.md) for usa
 ## Development and validation
 
 The authoritative source is `Shared/Godot/BF6_Godot_Patch` in [BF6 Unreal SDK](https://github.com/TabbedScamper/BF6_Unreal_SDK). Its distribution tools copy the shared Home frontend, templates and native helper into this repository and reject stale generated resource lists. Change the parent source to keep both editors synchronized.
+
+Startup validation includes real Windows shortcuts, first and subsequent editor launches, manual plugin enabling with unsaved work, explicit scene-tab restoration, and stock/folder Object Library variants. The library's isolated hidden initialization fell from 10.1 seconds with 11,141 loaded thumbnails to about 18 milliseconds with none. Loading its full index on first use still takes about 0.7 seconds on the test machine; these are component measurements, not whole-editor startup guarantees.
 
 Validation includes 61 creator-storage checks, 32 Home model checks, 21 actual Windows browser checks, 14 startup checks, dock visibility/restoration checks, 12 visible-editor create/import workflow checks, and separate shared-frontend browser tests. These cover preserved sources and native block bytes, rejected unsafe imports, map creation/resume, modal and non-modal windows, fonts and thumbnails. Ten Unreal automation tests also cover importing, saving and reopening shared projects, unavailable models, failed saves and recovery conflicts. Broader creator testing remains a release gate. An intermittent native-helper crash in headless editor import remains under investigation; the visible native-browser checks exit successfully.

@@ -20,7 +20,7 @@ def main():
     fixture.mkdir(parents=True, exist_ok=False)
     addon = fixture / "addons/bf6_map_selection"
     addon.mkdir(parents=True)
-    for name in ("map_panel.gd", "map_catalog.gd", "plugin.gd", "creator_project_store.gd"):
+    for name in ("map_panel.gd", "map_catalog.gd", "plugin.gd", "creator_project_store.gd", "home_session.gd"):
         shutil.copyfile(package / "addons/bf6_map_selection" / name, addon / name)
     shutil.copytree(package / "addons/bf6_map_selection/data", addon / "data")
     web = addon / "web"
