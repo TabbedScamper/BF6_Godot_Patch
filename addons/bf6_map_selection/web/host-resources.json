@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "files": [
+    "home/fonts/Roboto-Bold.ttf",
+    "home/fonts/Roboto-Regular.ttf",
+    "home/home.css",
+    "home/home.js",
+    "home/index.html",
+    "mapthumbs/MP_Abbasid.jpg",
+    "mapthumbs/MP_Aftermath.jpg",
+    "mapthumbs/MP_Aftermath_Portal.jpg",
+    "mapthumbs/MP_Badlands.jpg",
+    "mapthumbs/MP_Battery.jpg",
+    "mapthumbs/MP_Capstone.jpg",
+    "mapthumbs/MP_Contaminated.jpg",
+    "mapthumbs/MP_Dumbo.jpg",
+    "mapthumbs/MP_Eastwood.jpg",
+    "mapthumbs/MP_FireStorm.jpg",
+    "mapthumbs/MP_GolmudRailway.jpg",
+    "mapthumbs/MP_Granite_ClubHouse_Portal.jpg",
+    "mapthumbs/MP_Granite_MainStreet_Portal.jpg",
+    "mapthumbs/MP_Granite_Marina_Portal.jpg",
+    "mapthumbs/MP_Granite_MilitaryRnD_Portal.jpg",
+    "mapthumbs/MP_Granite_MilitaryStorage_Portal.jpg",
+    "mapthumbs/MP_Granite_TechCampus_Portal.jpg",
+    "mapthumbs/MP_Granite_Underground_Portal.jpg",
+    "mapthumbs/MP_Isolated.jpg",
+    "mapthumbs/MP_Limestone.jpg",
+    "mapthumbs/MP_Outskirts.jpg",
+    "mapthumbs/MP_Plaza.jpg",
+    "mapthumbs/MP_Portal_Sand.jpg",
+    "mapthumbs/MP_Subsurface.jpg",
+    "mapthumbs/MP_Tungsten.jpg"
+  ],
+  "entryPoints": [
+    "home/index.html"
+  ],
+  "ipcOperations": [
+    "log"
+  ]
+}

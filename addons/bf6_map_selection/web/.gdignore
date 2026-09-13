@@ -1,0 +1,1 @@
+# Browser resources are read directly by the offline host, not Godot importers.
