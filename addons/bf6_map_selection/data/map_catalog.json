@@ -1,0 +1,294 @@
+{
+  "format": 1,
+  "source": {
+    "manifest": "Plugins/BF6UnrealSDK/Source/BF6UnrealSDK/Private/BF6MapManifest.h",
+    "manifest_sha256": "be60369df2718a2aa6ad8f36a5b437ba66fe791f5e84909670abe4dfdf578e29",
+    "home": "Plugins/BF6UnrealSDK/Source/BF6UnrealSDK/Private/BF6BuildMode.cpp",
+    "group_metadata_sha256": "37a5972ebbab5aaef81fc635367d388022b500682185ffe3ca495ebb7eefad69",
+    "images": "Plugins/BF6UnrealSDK/Resources/mapthumbs",
+    "theme": "Plugins/BF6UnrealSDK/Source/BF6UnrealSDK/Private/BF6Theme.h",
+    "theme_metadata_sha256": "43f00073514bfe2beb6eee7c918cd54975ef6a0c80755abe142dc3e0f82a1759"
+  },
+  "groups": [
+    {
+      "id": "paid",
+      "label": "Battlefield 6 maps"
+    },
+    {
+      "id": "free",
+      "label": "RedSec maps - free for everyone"
+    }
+  ],
+  "maps": [
+    {
+      "id": "MP_Abbasid",
+      "name": "Siege of Cairo",
+      "image": "thumbnails/MP_Abbasid.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 0
+    },
+    {
+      "id": "MP_Aftermath",
+      "name": "Empire State",
+      "image": "thumbnails/MP_Aftermath.jpg",
+      "size": "S",
+      "paid": true,
+      "group_id": "paid",
+      "order": 1
+    },
+    {
+      "id": "MP_Aftermath_Portal",
+      "name": "Bellum1988's Operation Metro",
+      "image": "thumbnails/MP_Aftermath_Portal.jpg",
+      "size": "S",
+      "paid": true,
+      "group_id": "paid",
+      "order": 2
+    },
+    {
+      "id": "MP_Badlands",
+      "name": "Blackwell Fields",
+      "image": "thumbnails/MP_Badlands.jpg",
+      "size": "L",
+      "paid": true,
+      "group_id": "paid",
+      "order": 3
+    },
+    {
+      "id": "MP_Battery",
+      "name": "Iberian Offensive",
+      "image": "thumbnails/MP_Battery.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 4
+    },
+    {
+      "id": "MP_Capstone",
+      "name": "Liberation Peak",
+      "image": "thumbnails/MP_Capstone.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 5
+    },
+    {
+      "id": "MP_Contaminated",
+      "name": "Contaminated",
+      "image": "thumbnails/MP_Contaminated.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 6
+    },
+    {
+      "id": "MP_Dumbo",
+      "name": "Manhattan Bridge",
+      "image": "thumbnails/MP_Dumbo.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 7
+    },
+    {
+      "id": "MP_Eastwood",
+      "name": "Eastwood",
+      "image": "thumbnails/MP_Eastwood.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 8
+    },
+    {
+      "id": "MP_FireStorm",
+      "name": "Operation Firestorm",
+      "image": "thumbnails/MP_FireStorm.jpg",
+      "size": "L",
+      "paid": true,
+      "group_id": "paid",
+      "order": 9
+    },
+    {
+      "id": "MP_GolmudRailway",
+      "name": "Golmud Railway",
+      "image": "thumbnails/MP_GolmudRailway.jpg",
+      "size": "L",
+      "paid": true,
+      "group_id": "paid",
+      "order": 10
+    },
+    {
+      "id": "MP_Granite_ClubHouse_Portal",
+      "name": "Golf Course",
+      "image": "thumbnails/MP_Granite_ClubHouse_Portal.jpg",
+      "size": "M",
+      "paid": false,
+      "group_id": "free",
+      "order": 11
+    },
+    {
+      "id": "MP_Granite_MainStreet_Portal",
+      "name": "Downtown",
+      "image": "thumbnails/MP_Granite_MainStreet_Portal.jpg",
+      "size": "M",
+      "paid": false,
+      "group_id": "free",
+      "order": 12
+    },
+    {
+      "id": "MP_Granite_Marina_Portal",
+      "name": "Marina",
+      "image": "thumbnails/MP_Granite_Marina_Portal.jpg",
+      "size": "M",
+      "paid": false,
+      "group_id": "free",
+      "order": 13
+    },
+    {
+      "id": "MP_Granite_MilitaryRnD_Portal",
+      "name": "Area 22B",
+      "image": "thumbnails/MP_Granite_MilitaryRnD_Portal.jpg",
+      "size": "M",
+      "paid": false,
+      "group_id": "free",
+      "order": 14
+    },
+    {
+      "id": "MP_Granite_MilitaryStorage_Portal",
+      "name": "Redline Storage",
+      "image": "thumbnails/MP_Granite_MilitaryStorage_Portal.jpg",
+      "size": "M",
+      "paid": false,
+      "group_id": "free",
+      "order": 15
+    },
+    {
+      "id": "MP_Granite_TechCampus_Portal",
+      "name": "Defense Nexus",
+      "image": "thumbnails/MP_Granite_TechCampus_Portal.jpg",
+      "size": "M",
+      "paid": false,
+      "group_id": "free",
+      "order": 16
+    },
+    {
+      "id": "MP_Granite_Underground_Portal",
+      "name": "Complex 3",
+      "image": "thumbnails/MP_Granite_Underground_Portal.jpg",
+      "size": "S",
+      "paid": false,
+      "group_id": "free",
+      "order": 17
+    },
+    {
+      "id": "MP_Isolated",
+      "name": "Tsuru Reef",
+      "image": "thumbnails/MP_Isolated.jpg",
+      "size": "L",
+      "paid": true,
+      "group_id": "paid",
+      "order": 18
+    },
+    {
+      "id": "MP_Limestone",
+      "name": "Saints Quarter",
+      "image": "thumbnails/MP_Limestone.jpg",
+      "size": "S",
+      "paid": true,
+      "group_id": "paid",
+      "order": 19
+    },
+    {
+      "id": "MP_Outskirts",
+      "name": "New Sobek City",
+      "image": "thumbnails/MP_Outskirts.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 20
+    },
+    {
+      "id": "MP_Plaza",
+      "name": "Cairo Bazaar",
+      "image": "thumbnails/MP_Plaza.jpg",
+      "size": "S",
+      "paid": true,
+      "group_id": "paid",
+      "order": 21
+    },
+    {
+      "id": "MP_Portal_Sand",
+      "name": "Portal Sandbox",
+      "image": "thumbnails/MP_Portal_Sand.jpg",
+      "size": "L",
+      "paid": false,
+      "group_id": "free",
+      "order": 22
+    },
+    {
+      "id": "MP_Subsurface",
+      "name": "Hagental Base",
+      "image": "thumbnails/MP_Subsurface.jpg",
+      "size": "M",
+      "paid": true,
+      "group_id": "paid",
+      "order": 23
+    },
+    {
+      "id": "MP_Tungsten",
+      "name": "Mirak Valley",
+      "image": "thumbnails/MP_Tungsten.jpg",
+      "size": "L",
+      "paid": true,
+      "group_id": "paid",
+      "order": 24
+    }
+  ],
+  "theme_color_space": "srgb",
+  "theme": {
+    "ink": [
+      0.03529411764705882,
+      0.0392156862745098,
+      0.0392156862745098,
+      1.0
+    ],
+    "panel": [
+      0.06666666666666667,
+      0.07450980392156863,
+      0.0784313725490196,
+      1.0
+    ],
+    "panel_light": [
+      0.15294117647058825,
+      0.16862745098039217,
+      0.1803921568627451,
+      1.0
+    ],
+    "accent": [
+      1.0,
+      0.23529411764705882,
+      0.0,
+      1.0
+    ],
+    "text": [
+      0.7490196078431373,
+      0.792156862745098,
+      0.8196078431372549,
+      1.0
+    ],
+    "text_dim": [
+      0.4588235294117647,
+      0.5098039215686274,
+      0.5411764705882353,
+      1.0
+    ],
+    "line": [
+      0.6823529411764706,
+      0.7529411764705882,
+      0.8,
+      0.25
+    ]
+  }
+}

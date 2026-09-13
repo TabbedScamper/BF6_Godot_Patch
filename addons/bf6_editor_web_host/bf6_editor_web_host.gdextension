@@ -1,0 +1,8 @@
+[configuration]
+entry_symbol = "bf6_offline_webview_init"
+compatibility_minimum = 4.1
+reloadable = false
+
+[libraries]
+windows.debug.x86_64 = "bin/windows-x86_64/bf6_offline_webview.dll"
+windows.release.x86_64 = "bin/windows-x86_64/bf6_offline_webview.dll"

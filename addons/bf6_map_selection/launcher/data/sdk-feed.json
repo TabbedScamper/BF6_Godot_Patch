@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "authority": "Source/BF6UnrealSDK/Private/BF6UnrealSDK.cpp",
+  "index_url": "https://download.portal.battlefield.com/versions.json",
+  "archive_url": "https://download.portal.battlefield.com/PortalSDK.zip",
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) BF6UnrealSDK"
+}
