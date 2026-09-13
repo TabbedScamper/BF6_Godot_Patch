@@ -4,6 +4,8 @@ extends EditorPlugin
 const MapPanel = preload("map_panel.gd")
 const Catalog = preload("map_catalog.gd")
 const Store = preload("creator_project_store.gd")
+const HomeSession = preload("home_session.gd")
+const RESTORE_TABS := "Restore previous BF6 scene tabs"
 const PANEL_ID := "bf6.map_selection"
 var _panel: Control
 var _workspace_dialog: EditorFileDialog
@@ -21,6 +23,11 @@ var _reviewed := false
 var _pending: Dictionary = {}
 var _workspace_root := ""
 var _startup_home_pending := true
+var _manually_enabled := false
+var _session_opened := false
+var _pending_tabs: Dictionary = {}
+var _disabling := false
+var _restoring_tabs := false
 var _chrome_active := false
 var _prior_distraction_free := false
 var _chrome_controls: Array[Dictionary] = []
@@ -118,6 +125,10 @@ func _get_window_layout(configuration: ConfigFile) -> void:
 	if _chrome_active:
 		for key in _prior_dock_widths:
 			configuration.set_value("docks", key, _prior_dock_widths[key])
+	if HomeSession.enabled() and not _disabling:
+		HomeSession.stash(configuration, _session_opened, _pending_tabs)
+	else:
+		HomeSession.release_native(configuration, _pending_tabs)
 
 func _apply_home_chrome() -> void:
 	if not _chrome_active or not is_instance_valid(_panel) or not _panel.visible:
@@ -178,6 +189,10 @@ func _restore_editor_chrome(force: bool = false) -> void:
 	_chrome_windows.clear()
 
 func _enter_tree() -> void:
+	EditorInterface.get_base_control().set_meta("bf6_home_startup_pending", true)
+	_prepare_home_session.call_deferred()
+	add_tool_menu_item(RESTORE_TABS, func(): _restore_previous_tabs.call_deferred())
+	scene_changed.connect(_session_scene_changed)
 	_panel = MapPanel.new()
 	EditorInterface.get_editor_main_screen().add_child(_panel)
 	_panel.hide()
@@ -275,6 +290,8 @@ func _set_window_layout(_configuration: ConfigFile) -> void:
 	_finish_startup_home.call_deferred()
 
 func _enable_plugin() -> void:
+	_manually_enabled = true
+	_pending_tabs = HomeSession.previous()
 	# This callback is for an explicit enable, not normal startup restoration.
 	# If a scan is running, its completion takes the same one-shot path instead.
 	if not EditorInterface.get_resource_filesystem().is_scanning():
@@ -291,12 +308,75 @@ func _finish_startup_home() -> void:
 	if filesystem.sources_changed.is_connected(_startup_sources_changed):
 		filesystem.sources_changed.disconnect(_startup_sources_changed)
 	_show_home()
+	_release_startup_gate.call_deferred()
+
+func _release_startup_gate() -> void:
+	EditorInterface.get_base_control().remove_meta("bf6_home_startup_pending")
+
+func _prepare_home_session() -> void:
+	if _manually_enabled or not is_inside_tree():
+		return
+	var issue := HomeSession.prepare_startup()
+	_pending_tabs = HomeSession.previous()
+	if not issue.is_empty():
+		_panel.show_status(issue)
+
+func _session_scene_changed(root: Node) -> void:
+	if root != null and not _startup_home_pending:
+		_session_opened = true
+
+func _tabs_to_restore() -> Dictionary:
+	var previous: Dictionary = _pending_tabs.duplicate(true)
+	if previous.is_empty():
+		previous = HomeSession.previous()
+	var active := EditorInterface.get_open_scenes()
+	var edited := EditorInterface.get_edited_scene_root()
+	if edited != null and not active.is_empty():
+		previous.current = edited.scene_file_path
+	var scenes: PackedStringArray = previous.scenes
+	for path in active:
+		if path not in scenes:
+			scenes.append(path)
+	previous.scenes = scenes
+	return previous
+
+func _restore_previous_tabs() -> void:
+	if _restoring_tabs:
+		return
+	_restoring_tabs = true
+	var previous := _tabs_to_restore()
+	HomeSession.restore_for_home(weakref(self), previous)
+
+func _complete_tab_restore(previous: Dictionary, remaining: Dictionary) -> void:
+	_pending_tabs = remaining
+	_restoring_tabs = false
+	if not EditorInterface.get_open_scenes().is_empty():
+		EditorInterface.set_main_screen_editor("3D")
+	_session_opened = true
+	queue_save_layout()
+	var missing: int = _pending_tabs.scenes.size()
+	if missing > 0:
+		_panel.show_status("Skipped %d previous scene tab(s) whose files are unavailable." % missing)
+	elif previous.scenes.is_empty():
+		_panel.show_status("There are no previous scene tabs to restore.")
+
+func _disable_plugin() -> void:
+	# Native layout saves after removal only know actual scene tabs. Reopen the
+	# pending tabs before yielding ownership, preserving the active unsaved tab.
+	_disabling = true
+	var previous := _tabs_to_restore()
+	var issue := HomeSession.prepare_startup(true)
+	if not issue.is_empty():
+		push_warning(issue)
+	HomeSession.restore_for_native(previous)
 
 func _show_home() -> void:
 	if is_instance_valid(_panel):
 		EditorInterface.set_main_screen_editor("BF6 Home")
 
 func _exit_tree() -> void:
+	_release_startup_gate()
+	remove_tool_menu_item(RESTORE_TABS)
 	_restore_editor_chrome(true)
 	_startup_home_pending = false
 	var filesystem := EditorInterface.get_resource_filesystem()

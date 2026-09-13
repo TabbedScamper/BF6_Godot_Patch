@@ -29,6 +29,26 @@
       "destination": "addons/bf6_map_selection/launcher/godot_patch_launcher.py"
     },
     {
+      "source": "Tools/launch_bf6_godot.ps1",
+      "destination": "addons/bf6_map_selection/launcher/launch_bf6_godot.ps1"
+    },
+    {
+      "source": "Tools/Launch BF6 Godot.cmd",
+      "destination": "addons/bf6_map_selection/launcher/Launch BF6 Godot.cmd"
+    },
+    {
+      "source": "Tools/godot_library_compat.ps1",
+      "destination": "addons/bf6_map_selection/launcher/godot_library_compat.ps1"
+    },
+    {
+      "source": "Tools/patches/scene-library-lazy-v1.json",
+      "destination": "addons/bf6_map_selection/launcher/data/scene-library-lazy-v1.json"
+    },
+    {
+      "source": "Tools/patches/SCENE-LIBRARY-LICENSE.md",
+      "destination": "addons/bf6_map_selection/launcher/data/SCENE-LIBRARY-LICENSE.md"
+    },
+    {
       "source": "Tools/GODOT-PATCH-LAUNCHER.md",
       "destination": "addons/bf6_map_selection/launcher/README.md"
     },
@@ -37,11 +57,11 @@
       "destination": "addons/bf6_map_selection/launcher/data/map_catalog.json"
     }
   ],
-  "source_digest": "4a147dadf3f3103d2562247d31784c0f51733fce732fd2caf8f6b4b1465cf6d3",
+  "source_digest": "fea831acad4c1aa8623627a0cf7bd2f62fc1d1dba3d78197ce3dda65689e81c5",
   "files": {
     ".gitattributes": "320da3e2216b69492dbe1faee529e3a19e2311814bd5e65ae78232126e64f6eb",
     ".gitignore": "fb3659646c53cf508c5923e73796e6a89d124a42b9061834d5be490d61999601",
-    "README.md": "14d1b3e2647f9b9abba70e9c46da2fb462c58399dc261efba15ecead87eff560",
+    "README.md": "b99b0d0df4509eacd1f3f21544f6be5c8b5203a96a5dd0290e1e3d7cd2b34ca8",
     "addons/bf6_editor_web_host/API.md": "316a206be48bd2b9dddd9c50b90fdaa7fabdd9e4f9f3b9ae3cc917208ca07c1f",
     "addons/bf6_editor_web_host/LICENSE-godot-wry.txt": "48a96a075b0a0c8a26f15d71b434a9f1538f1982a9862a708eadb713c3c99fba",
     "addons/bf6_editor_web_host/bf6_editor_web_host.gdextension": "ccc601c65d24fc81b6634c53a6463723886f064a5b1e5e0a5a70c1f538afafc2",
@@ -154,15 +174,21 @@
     "addons/bf6_editor_web_host/third-party-licenses/wry-0.50.5/LICENSE.spdx": "26235c41e314fb0da35b33b2bb5bcbc4dd523839f8eeca52efcd43586f441fb5",
     "addons/bf6_map_selection/creator_project_store.gd": "6460310c8ac822f013c8b704663cae611ac91338aee4acb40d1a51306e980e80",
     "addons/bf6_map_selection/data/map_catalog.json": "30ef3a37f4b5ad4de38175827c0ff065f3481d4215aa44e7b21fb0035ef83116",
+    "addons/bf6_map_selection/home_session.gd": "32086db9d41b2117f50bdc51909f02a343927ec57d0a2940e79cbfdb8967e270",
+    "addons/bf6_map_selection/launcher/Launch BF6 Godot.cmd": "19f9a63fa6878f5a381ed50e23e3baba88f89c3fba8d995e818eb51c1e633f1b",
     "addons/bf6_map_selection/launcher/README.md": "43f850d35214a49bf9c475e1310c11f4663a394bdc7ae6e290bbc433059fd620",
+    "addons/bf6_map_selection/launcher/data/SCENE-LIBRARY-LICENSE.md": "0d86f167b9efbf2ce0ee6e72ad7c84d00ac34521f69c75849acba84be951a618",
     "addons/bf6_map_selection/launcher/data/map_catalog.json": "30ef3a37f4b5ad4de38175827c0ff065f3481d4215aa44e7b21fb0035ef83116",
+    "addons/bf6_map_selection/launcher/data/scene-library-lazy-v1.json": "eb4248bf59da408f110a332072d8eeac411158be360d127072c6fa6c3a4e89fc",
     "addons/bf6_map_selection/launcher/data/sdk-feed.json": "874541352a4928b0ee5be1107039683b8f5d47a4f9aee40f17852a98b4d3adea",
+    "addons/bf6_map_selection/launcher/godot_library_compat.ps1": "468058d2e552c84ef487eee12e68dc44b4dd4a8275588248beafcc126e3aca6a",
     "addons/bf6_map_selection/launcher/godot_patch_launcher.py": "5f54e41af64f0bdb8f91be93eeb975675eb8dccbfec77bafad64d7228782998e",
     "addons/bf6_map_selection/launcher/godot_patch_sdk.py": "d61b0c3bb78c8188afc921d94c29042925c8eae828c59f621bcc67c6bdf2bdc3",
+    "addons/bf6_map_selection/launcher/launch_bf6_godot.ps1": "ae0601b1dddd3317a830a45410ea7fde5ff0eba5d2821f32c2ed57d3753ba977",
     "addons/bf6_map_selection/map_catalog.gd": "69f656ceab8f4a6d24ed5b5028aacc06cff565ad76ce167779f0eff12cad6028",
     "addons/bf6_map_selection/map_panel.gd": "04b6cf4b4730a656a4c7504012abddbcd83a963ae322e1bbf44e67b8fa9dcbe9",
-    "addons/bf6_map_selection/plugin.cfg": "011dbc188313b3928aeb8f433ae68093585ce20c62058238982ed2b2e51c5bea",
-    "addons/bf6_map_selection/plugin.gd": "ee9267c861e094b638c2303e18ae911cafe824953e8e7d1087c13666936dcaac",
+    "addons/bf6_map_selection/plugin.cfg": "3434fa263d9b154b13e4aba2317865a633450bd47f28bca64de7807b10922b1c",
+    "addons/bf6_map_selection/plugin.gd": "d6342a36d1ef914883bd5454de81b48543c9bf3ee7c93a27dd2d5cd844f7cb39",
     "addons/bf6_map_selection/template/README.md": "18cab04145432cb6b28cdad29609f7f1345ca30b286dba3ff96a942714492014",
     "addons/bf6_map_selection/template/package-lock.json": "180609df8564c80ec64a21ac73359b4707bcff112d12854012e5253586203b4d",
     "addons/bf6_map_selection/template/package.json": "fa4d881ef9ad717459b285e645e5f9fdb1dff22ae8b2e38b4b7b4dacc74c799e",
@@ -208,7 +234,7 @@
     "docs/MAP-CATALOG.md": "139f28014b497b3dcb1a3aede1d3f02d0c74e995c8843a315dce3de14a8f70ab",
     "tests/creator_project_store_tests.gd": "8d6af6aae21715fad2697fb848fafe6ff8ecc8e1f68a8bc8d9605b28b082fff9",
     "tests/run_creator_store_tests.py": "3d06f1f0af8f7573aff7a40210bb64f3e4c5e944d993dbaea003d62d219497d5",
-    "tests/run_shared_home_tests.py": "e598453f1b74dd62e2055aba04f622d6969f5d8f596e96dcd3d805cd4fcd8ed2",
+    "tests/run_shared_home_tests.py": "45343071d85ae12dd9ed5b2b7513be2c621893783a719464b52c65974d23ae7a",
     "tests/run_tests.gd": "36e1a27d697bf48169afd86ef85cc058211056cad24903fb30b076848f619eef",
     "tests/shared_home_native.gd": "9eb95127b1e2823448effa0b4c726029a5e2ea183c2d8fbb83cb4bf23676c49b"
   }
